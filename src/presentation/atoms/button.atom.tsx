@@ -16,7 +16,7 @@ const ButtonAtom: React.FC<ButtonAtom> = ({ children, className, disabled, onPre
 			onPress={disabled ? undefined : onPress}
 			{...rest}
 			>
-			<TextAtom size="medium" className={`${text} ${disabled && 'text-gray-tertiary'}`}>{children}</TextAtom>
+			<TextAtom size="medium" className={`${disabled ? 'text-gray-tertiary' : 'text-gray-primary'}`}>{children}</TextAtom>
 		</TouchableOpacity>
 	)
 }

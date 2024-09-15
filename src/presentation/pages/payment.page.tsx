@@ -15,7 +15,9 @@ import { MainTemplate } from "@/presentation/templates/main.template";
 import { TicketMolecule } from "@/presentation/molecules/ticket.molecule";
 import { EmojiSelectionMolecule } from "@/presentation/molecules/emojiSelection.molecule";
 
-const PaymentPage = () => {
+type PaymentPage = {}
+
+const PaymentPage: React.FC<PaymentPage> = () => {
 	const [goods, setGoods] = useState<GoodEntity[]>([]);
 	const [goodQuantity, setGoodQuantity] = useState<{ [key: string]: number }>({});
 	const [selectedGoods, setSelectedGoods] = useState<string[]>([]);
