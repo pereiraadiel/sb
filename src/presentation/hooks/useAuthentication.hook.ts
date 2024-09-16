@@ -1,27 +1,36 @@
 import { create } from "zustand";
 import { AuthenticateUsecaseFactory } from "@/domain/usecases/authenticate.usecase";
+import { SaleStandEntity } from "../../domain/entities/saleStand.entity";
 
 type useAuthentication = {
   authToken: string | null;
   authError: string | null;
-  authStand: string;
+  stand: SaleStandEntity | null;
   authFetching: boolean;
   authenticate: (code: string) => Promise<void>;
+  logout: () => void;
 };
 
 const useAuthentication = create<useAuthentication>((set) => {
   return {
     authToken: null,
     authError: null,
-    authStand: "",
+    stand: null,
     authFetching: false,
+
     authenticate: async (code: string) => {
       try {
-        set({ authError: null, authToken: null, authFetching: true });
+        set({
+          authError: null,
+          authToken: null,
+          authFetching: true,
+          stand: null,
+        });
+
         setTimeout(async () => {
-          const { authToken, authStand } =
+          const { authToken, stand } =
             await AuthenticateUsecaseFactory().execute(code);
-          set({ authToken, authStand });
+          set({ authToken, stand });
         }, 1000);
       } catch (error: any) {
         console.error(error);
@@ -29,6 +38,15 @@ const useAuthentication = create<useAuthentication>((set) => {
       } finally {
         set({ authFetching: false });
       }
+    },
+
+    logout: () => {
+      set({
+        authToken: null,
+        stand: null,
+        authError: null,
+        authFetching: false,
+      });
     },
   };
 });

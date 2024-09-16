@@ -7,9 +7,6 @@ export class GetTicketByQrCodeUsecase {
   async execute(qrCode: string): Promise<TicketEntity> {
     try {
       console.warn("GetTicketByQrCodeUsecase: ", qrCode);
-      const random = Math.floor(Math.random() * 2);
-      console.warn("Random: ", random);
-      if (random) throw new Error("Fake error for testing, qrCode: " + qrCode);
       return await this.apiService.getTicketByQrCode(qrCode);
     } catch (error) {
       console.error("GetTicketByQrCodeUsecase: ", error);

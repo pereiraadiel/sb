@@ -11,6 +11,7 @@ import { HeaderMolecule } from "@/presentation/molecules/header.molecule";
 import { TicketMolecule } from "@/presentation/molecules/ticket.molecule";
 import { TextAtom } from "@/presentation/atoms/text.atom";
 import useQrCode from "@/presentation/hooks/useQrCode.hook";
+import useAuthentication from "@/presentation/hooks/useAuthentication.hook";
 
 type CreditPage = {}
 
@@ -20,7 +21,16 @@ const CreditPage: React.FC<CreditPage> = ({}) => {
 	const [finalTicketAmount, setFinalTicketAmount] = useState<number>(0);
 	const { navigate } = useNavigation<any>();
 	const { qrCode } = useQrCode();
+	const { authToken, stand } = useAuthentication();
 
+	if(!authToken) {
+		navigate('Welcome');
+		return null;
+	}
+
+	if(!stand) {
+		return null;
+	}
 
 	const handleNavigate = () => {
 		console.log('credit: ', credit)
@@ -48,7 +58,7 @@ const CreditPage: React.FC<CreditPage> = ({}) => {
 
 	return (
 		<MainTemplate>
-			<HeaderMolecule title="São Benedito" subtitle="Caixa"/>
+			<HeaderMolecule title="São Benedito" subtitle={stand.fullname}/>
 			
 			{ticket && (
 				<TicketMolecule ticket={ticket}/>

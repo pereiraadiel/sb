@@ -6,15 +6,19 @@ import { SeparatorAtom } from "@/presentation/atoms/separator.atom";
 import { ButtonAtom } from "@/presentation/atoms/button.atom";
 import { TextAtom } from "@/presentation/atoms/text.atom";
 import useRole from "@/presentation/hooks/useRole.hook";
+import useAuthentication from "@/presentation/hooks/useAuthentication.hook";
 
 type WelcomePage = {}
 
 const WelcomePage: React.FC<WelcomePage> = ({}) => {
 	const { navigate } = useNavigation<any>();
+	const { logout } = useAuthentication();
 	const { setRole } = useRole();
 
 	const handleNavigate = (context: 'barraquinha' | 'caixa') => {
+		console.warn('handleNavigate: ', context);
 		setRole(context);
+		logout()
 		navigate('Auth');
 	}
 

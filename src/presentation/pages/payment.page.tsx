@@ -2,7 +2,6 @@ import { FlatList, View } from "react-native";
 import { useState, useEffect } from "react";
 import { useNavigation, useRoute } from "@react-navigation/native";
 
-import { GOODS } from "@/domain/utils/goods";
 import { toBrlCurrency } from "@/domain/utils/currency.util";
 import { GoodEntity } from "@/domain/entities/good.entity";
 import { EMOJIS } from "@/domain/utils/emoji.util";
@@ -32,12 +31,17 @@ const PaymentPage: React.FC<PaymentPage> = () => {
 	const route = useRoute<any>();
 	const { qrCode } = route.params;
 	const { ticket, getTicketByQr } = useTicket();
-	const { authToken, authStand } = useAuthentication();
+	const { authToken, stand } = useAuthentication();
 
 	if(!authToken) {
 		navigate('Welcome');
 		return null;
 	}
+
+	if(!stand) {
+		return null;
+	}
+
 
   const handleSelect = (good: GoodEntity) => {
 		if(!ticket) return;
@@ -76,7 +80,7 @@ const PaymentPage: React.FC<PaymentPage> = () => {
 	}
 
 	const fetchGoods  = () => {
-		setGoods(GOODS);
+		setGoods(stand.goods);
 	}
 
 	const fetchTicketEmojis = () => {
@@ -120,7 +124,7 @@ const PaymentPage: React.FC<PaymentPage> = () => {
 	
 	return (
 		<MainTemplate>
-			<HeaderMolecule title='São Benedito' subtitle={authStand}/>
+			<HeaderMolecule title='São Benedito' subtitle={stand.fullname}/>
 
 			{ticket && (
 				<TicketMolecule ticket={ticket}/>
@@ -129,7 +133,7 @@ const PaymentPage: React.FC<PaymentPage> = () => {
 			<SeparatorAtom className="mt-2 mb-3"/>
 
 			<FlatList
-				data={GOODS}
+				data={goods}
 				keyExtractor={(good) => good.id}
 				renderItem={({ item: good }) => (
 					<GoodMolecule good={good} quantity={goodQuantity[good.id]} onChangeQuantity={handleGoodQuantity} selected={selectedGoods.includes(good.id)} onSelect={() => handleSelect(good)}/>

@@ -6,9 +6,6 @@ export class AuthenticateUsecase {
   async execute(code: string) {
     try {
       console.warn("AuthenticateUsecase: ", code);
-      const random = Math.floor(Math.random() * 2);
-      console.warn("Random: ", random);
-      if (random) throw new Error("Fake error for testing, code: " + code);
       return await this.apiService.authenticate(code);
     } catch (error) {
       console.error("AuthenticateUsecase: ", error);

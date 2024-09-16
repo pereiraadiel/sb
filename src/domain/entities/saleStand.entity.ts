@@ -2,7 +2,7 @@ import { GoodEntity } from "./good.entity";
 
 export class SaleStandEntity {
   id!: string;
-  name!: string;
+  category!: string;
   fullname!: string;
   goods: GoodEntity[] = [];
 
