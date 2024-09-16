@@ -6,9 +6,9 @@ type ButtonAtom = {
 } & TouchableOpacityProps;
 
 const ButtonAtom: React.FC<ButtonAtom> = ({ children, className, disabled, onPress, variant, ...rest}) => {
-	const bg = variant === 'outline' ? 'bg-transparent' : 'bg-accent-primary';
-	const border = variant === 'outline' ? 'border border-accent-primary' : '';
-	const text = variant === 'outline' ? 'text-accent-primary' : 'text-gray-primary';
+	const bg = variant === 'outline' ? 'bg-transparent' : 'bg-accent-tertiary';
+	const border = variant === 'outline' ? 'border border-accent-tertiary' : '';
+	const text = variant === 'outline' ? 'text-accent-tertiary' : 'text-gray-primary';
 	return (
 		<TouchableOpacity 
 			activeOpacity={0.9} 
@@ -16,7 +16,7 @@ const ButtonAtom: React.FC<ButtonAtom> = ({ children, className, disabled, onPre
 			onPress={disabled ? undefined : onPress}
 			{...rest}
 			>
-			<TextAtom size="medium" className={`${disabled ? 'text-gray-tertiary' : 'text-gray-primary'}`}>{children}</TextAtom>
+			<TextAtom size="medium" className={`${disabled ? 'text-gray-tertiary/95' : variant === 'outline' ? 'text-accent-primary' : 'text-gray-primary'}`}>{children}</TextAtom>
 		</TouchableOpacity>
 	)
 }

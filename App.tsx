@@ -8,12 +8,10 @@ import { WelcomePage } from "./src/presentation/pages/welcome.page"
 
 export default function App() { 
   return (
-    <>
-      <NavigationContainer>
-        {/* <StackOrganism/> */}
-        <WelcomePage/>
-      </NavigationContainer>
+    <NavigationContainer>
+      <StackOrganism/>
+      {/* <WelcomePage/> */}
       <AppStatusBar style="light" />
-    </>
+    </NavigationContainer>
   )
 }

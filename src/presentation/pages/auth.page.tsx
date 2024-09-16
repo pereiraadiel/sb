@@ -1,16 +1,23 @@
 import { Image, View } from "react-native"
+import { useEffect, useState } from "react";
+import { useNavigation, useRoute } from "@react-navigation/native"
 
 import { MainTemplate } from "@/presentation/templates/main.template";
 import { SeparatorAtom } from "@/presentation/atoms/separator.atom";
 import { ButtonAtom } from "@/presentation/atoms/button.atom";
 import { TextAtom } from "@/presentation/atoms/text.atom";
-import { InputAtom } from "../atoms/input.atom";
-import { useState } from "react";
+import { InputAtom } from "@/presentation/atoms/input.atom";
 
-type AuthPage = {}
-
-const AuthPage: React.FC<AuthPage> = ({}) => {
+type AuthPage = {};
+ 
+const AuthPage: React.FC<AuthPage> = ({ }) => {
 	const [accessCode, setAccessCode] = useState<string>('');
+	const { navigate } = useNavigation<any>();
+
+	const handleNavigate = () => {
+		console.log('accessCode: ', accessCode)
+		navigate('Home');
+	}
 
 	return (
 		<MainTemplate>
@@ -37,7 +44,7 @@ const AuthPage: React.FC<AuthPage> = ({}) => {
 				onChangeText={setAccessCode}
 				keyboardType="number-pad"
 			/>
-			<ButtonAtom className="mt-4" disabled={accessCode === ''}>Acessar</ButtonAtom>
+			<ButtonAtom  onPress={handleNavigate} className="mt-4" disabled={!accessCode.length}>Acessar</ButtonAtom>
 		</MainTemplate>
 	)
 }

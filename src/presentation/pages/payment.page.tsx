@@ -14,6 +14,8 @@ import { GoodMolecule } from "@/presentation/molecules/good.molecule";
 import { MainTemplate } from "@/presentation/templates/main.template";
 import { TicketMolecule } from "@/presentation/molecules/ticket.molecule";
 import { EmojiSelectionMolecule } from "@/presentation/molecules/emojiSelection.molecule";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import { HeaderMolecule } from "../molecules/header.molecule";
 
 type PaymentPage = {}
 
@@ -26,27 +28,44 @@ const PaymentPage: React.FC<PaymentPage> = () => {
   const [total, setTotal] = useState<GoodEntity>(new GoodEntity({ id: "total", category: "Total", fullname: "Total", description: "Total", priceCents: 0 }))
   const [finalTicketAmount, setFinalTicketAmount] = useState<number>(0);
 	const [selectedEmoji, setSelectedEmoji] = useState<keyof typeof EMOJIS>();
+	const { navigate } = useNavigation<any>();
+	const route = useRoute<any>();
+	const { qrCode } = route.params;
 
   const handleSelect = (good: GoodEntity) => {
-    const index = selectedGoods.indexOf(good.id)
-    if (index === -1) {
-      setSelectedGoods([...selectedGoods, good.id])
-			setGoodQuantity({ ...goodQuantity, [good.id]: 1 });
-    } else {
-      setSelectedGoods(selectedGoods.filter((id) => id !== good.id))
-    }
+		if(!ticket) return;
+		setTimeout(() => {
+			const index = selectedGoods.indexOf(good.id)
+			if (index === -1) {
+				if(total.priceCents + good.priceCents > ticket.balance) return;
+				setSelectedGoods([...selectedGoods, good.id])
+				setGoodQuantity({ ...goodQuantity, [good.id]: 1 });
+			} else {
+				setSelectedGoods(selectedGoods.filter((id) => id !== good.id))
+			}
+		}, 100);
   }
 
 	const handleGoodQuantity = (good: GoodEntity, action: 'add' | 'minus') => {
-		const newQuantity = { ...goodQuantity };
-		const currentQuantity = newQuantity[good.id] || 0;
-		if (action === 'add') {
-			newQuantity[good.id] = currentQuantity + 1;
-		} else {
-			if(currentQuantity === 1) return;
-			newQuantity[good.id] = currentQuantity - 1;
-		}
-		setGoodQuantity(newQuantity);
+		if(!ticket) return;
+		setTimeout(() => {
+			const newQuantity = { ...goodQuantity };
+			const currentQuantity = newQuantity[good.id] || 0;
+			if (action === 'add') {
+				if((total.priceCents + good.priceCents) > ticket.balance) return;
+				newQuantity[good.id] = currentQuantity + 1;
+			} else {
+				if(currentQuantity === 1) return;
+				newQuantity[good.id] = currentQuantity - 1;
+			}
+			setGoodQuantity(newQuantity);
+		}, 100);
+
+	}
+
+	const handleNavigate = () => {
+		console.log('navigating to payment done page');
+		navigate('PaymentDone', { balance: finalTicketAmount });
 	}
 
 	const fetchGoods  = () => {
@@ -54,7 +73,8 @@ const PaymentPage: React.FC<PaymentPage> = () => {
 	}
 
 	const fetchTicket = () => {
-		setTicket(new TicketEntity({ id: "1", physicalCode: "a02fji389", balance: 10000, phoneNumber: "11999999999" }));
+		console.log('fetching ticket with qrCode: ', qrCode);
+		setTicket(new TicketEntity({ id: "1", physicalCode: qrCode, balance: 10000, phoneNumber: "11999999999" }));
 	}
 
 	const fetchTicketEmojis = () => {
@@ -97,12 +117,7 @@ const PaymentPage: React.FC<PaymentPage> = () => {
 	
 	return (
 		<MainTemplate>
-			<View className="flex-row items-center mb-2 flex justify-between">
-				<TextAtom size="large">Tessera</TextAtom>
-				<TextAtom size="medium" className="text-white-primary/60">
-					Caixa São Benedito
-				</TextAtom>
-			</View>
+			<HeaderMolecule title='São Benedito' subtitle='Barraquinha de ...'/>
 
 			{ticket && (
 				<TicketMolecule ticket={ticket}/>
@@ -130,7 +145,7 @@ const PaymentPage: React.FC<PaymentPage> = () => {
 						<TextAtom size="small">{toBrlCurrency(finalTicketAmount)}</TextAtom>
 					</View>
 					<EmojiSelectionMolecule emojis={ticketEmojis} selectedEmoji={selectedEmoji} onSelect={setSelectedEmoji}/>
-					<ButtonAtom className="mt-4" disabled={selectedEmoji === undefined}>Finalizar transação</ButtonAtom>
+					<ButtonAtom onPress={handleNavigate} className="mt-4" disabled={selectedEmoji === undefined}>Finalizar transação</ButtonAtom>
 				</>
 			)}
 		</MainTemplate>

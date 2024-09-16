@@ -1,7 +1,7 @@
 import { View, StyleSheet } from "react-native";
 import { CameraView } from 'expo-camera/next';
-import { Camera } from 'expo-camera';
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { useFocusEffect } from "@react-navigation/native";
  
 type CameraAtom = {
 	onCodeScanned: (data: string) => void;
@@ -9,12 +9,13 @@ type CameraAtom = {
 
 const CameraAtom: React.FC<CameraAtom> = ({ onCodeScanned }) => {
 	const [scanned, setScanned] = useState(false);
-
-	useEffect(() => {
-		if (scanned) {
-			setTimeout(() => setScanned(false), 1500);
-		}
-	}, [scanned]);
+	
+	useFocusEffect(useCallback(() => {
+		console.log('CameraAtom', {
+			scanned
+		})
+		setScanned(false);
+	}, []))
 	
 	return (
 		<View className="bg-gray-primary w-96 h-96 border border-red-100">

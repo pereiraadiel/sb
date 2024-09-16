@@ -1,13 +1,23 @@
 import { Image, View } from "react-native"
+import { useNavigation } from "@react-navigation/native";
 
 import { MainTemplate } from "@/presentation/templates/main.template";
 import { SeparatorAtom } from "@/presentation/atoms/separator.atom";
 import { ButtonAtom } from "@/presentation/atoms/button.atom";
 import { TextAtom } from "@/presentation/atoms/text.atom";
+import useRole from "@/presentation/hooks/useRole.hook";
 
 type WelcomePage = {}
 
 const WelcomePage: React.FC<WelcomePage> = ({}) => {
+	const { navigate } = useNavigation<any>();
+	const { setRole } = useRole();
+
+	const handleNavigate = (context: 'barraquinha' | 'caixa') => {
+		setRole(context);
+		navigate('Auth');
+	}
+
 	return (
 		<MainTemplate>
 			<View className="flex-1 items-center mt-8">
@@ -27,8 +37,8 @@ const WelcomePage: React.FC<WelcomePage> = ({}) => {
 			</View>
 			<SeparatorAtom/>
 			<TextAtom size="medium" className="mt-4 text-center">Escolha uma opção para acessar</TextAtom>
-			<ButtonAtom className="mt-4">Barraquinha</ButtonAtom>
-			<ButtonAtom className="mt-1" variant="outline">Caixa</ButtonAtom>
+			<ButtonAtom onPress={() => handleNavigate('barraquinha')} className="mt-4">Barraquinha</ButtonAtom>
+			<ButtonAtom onPress={() => handleNavigate('caixa')} className="mt-1" variant="outline">Caixa</ButtonAtom>
 		</MainTemplate>
 	)
 }
