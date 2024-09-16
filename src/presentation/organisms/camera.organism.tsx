@@ -7,13 +7,22 @@ import { TextAtom } from "@/presentation/atoms/text.atom";
 import { CameraAtom } from "@/presentation/atoms/camera.atom";
 import useQrCode from "@/presentation/hooks/useQrCode.hook";
 import useRole from "@/presentation/hooks/useRole.hook";
+import useTicket from "@/presentation/hooks/useTicket.hook";
+import useAuthentication from "../hooks/useAuthentication.hook";
 
 type CameraOrganism = {}
 
 const CameraOrganism: React.FC<CameraOrganism> = () => {
 	const { navigate } = useNavigation<any>();
 	const {qrCode, setQrCode } = useQrCode();
+	const { getTicketByQr } = useTicket();
+	const { authToken } = useAuthentication();
 	const { role } = useRole();
+
+	if(!authToken) {
+		navigate('Welcome');
+		return null;
+	}
 
 	useFocusEffect(useCallback(() => {
 		setQrCode('');
@@ -30,7 +39,7 @@ const CameraOrganism: React.FC<CameraOrganism> = () => {
 				console.log('QR Code inválido');
 				return;
 			}
-			if(isValidQr) {
+			getTicketByQr(qrCode, authToken).then(() => {
 				if(role === 'barraquinha') { 
 					navigate('Payment', {qrCode});
 					return;
@@ -39,7 +48,8 @@ const CameraOrganism: React.FC<CameraOrganism> = () => {
 					navigate('Credit');
 					return;
 				}
-			}
+			})
+
 		}
 	}, [qrCode]);
 	

@@ -1,10 +1,10 @@
 import { FlatList, View } from "react-native";
 import { useState, useEffect } from "react";
+import { useNavigation, useRoute } from "@react-navigation/native";
 
 import { GOODS } from "@/domain/utils/goods";
 import { toBrlCurrency } from "@/domain/utils/currency.util";
 import { GoodEntity } from "@/domain/entities/good.entity";
-import { TicketEntity } from "@/domain/entities/ticket.entity";
 import { EMOJIS } from "@/domain/utils/emoji.util";
 
 import { ButtonAtom } from "@/presentation/atoms/button.atom";
@@ -14,8 +14,9 @@ import { GoodMolecule } from "@/presentation/molecules/good.molecule";
 import { MainTemplate } from "@/presentation/templates/main.template";
 import { TicketMolecule } from "@/presentation/molecules/ticket.molecule";
 import { EmojiSelectionMolecule } from "@/presentation/molecules/emojiSelection.molecule";
-import { useNavigation, useRoute } from "@react-navigation/native";
-import { HeaderMolecule } from "../molecules/header.molecule";
+import { HeaderMolecule } from "@/presentation/molecules/header.molecule";
+import useTicket from "@/presentation/hooks/useTicket.hook";
+import useAuthentication from "@/presentation/hooks/useAuthentication.hook";
 
 type PaymentPage = {}
 
@@ -23,7 +24,6 @@ const PaymentPage: React.FC<PaymentPage> = () => {
 	const [goods, setGoods] = useState<GoodEntity[]>([]);
 	const [goodQuantity, setGoodQuantity] = useState<{ [key: string]: number }>({});
 	const [selectedGoods, setSelectedGoods] = useState<string[]>([]);
-	const [ticket, setTicket] = useState<TicketEntity>();
 	const [ticketEmojis, setTicketEmojis] = useState(new Set<(keyof typeof EMOJIS)>());
   const [total, setTotal] = useState<GoodEntity>(new GoodEntity({ id: "total", category: "Total", fullname: "Total", description: "Total", priceCents: 0 }))
   const [finalTicketAmount, setFinalTicketAmount] = useState<number>(0);
@@ -31,6 +31,13 @@ const PaymentPage: React.FC<PaymentPage> = () => {
 	const { navigate } = useNavigation<any>();
 	const route = useRoute<any>();
 	const { qrCode } = route.params;
+	const { ticket, getTicketByQr } = useTicket();
+	const { authToken, authStand } = useAuthentication();
+
+	if(!authToken) {
+		navigate('Welcome');
+		return null;
+	}
 
   const handleSelect = (good: GoodEntity) => {
 		if(!ticket) return;
@@ -43,7 +50,7 @@ const PaymentPage: React.FC<PaymentPage> = () => {
 			} else {
 				setSelectedGoods(selectedGoods.filter((id) => id !== good.id))
 			}
-		}, 100);
+		}, 50);
   }
 
 	const handleGoodQuantity = (good: GoodEntity, action: 'add' | 'minus') => {
@@ -72,11 +79,6 @@ const PaymentPage: React.FC<PaymentPage> = () => {
 		setGoods(GOODS);
 	}
 
-	const fetchTicket = () => {
-		console.log('fetching ticket with qrCode: ', qrCode);
-		setTicket(new TicketEntity({ id: "1", physicalCode: qrCode, balance: 10000, phoneNumber: "11999999999" }));
-	}
-
 	const fetchTicketEmojis = () => {
 		for(let i = 0; i < 8; i++) {
 			const randomIndex = Math.floor(Math.random() * Object.keys(EMOJIS).length);
@@ -101,9 +103,10 @@ const PaymentPage: React.FC<PaymentPage> = () => {
 
 	useEffect(() => {
 		fetchGoods();
-		fetchTicket();
+		getTicketByQr(qrCode, authToken);
 		fetchTicketEmojis();
 	}, []);
+
 
 	useEffect(() => {
 		const newTicketTotal = calculateFinalTicketAmount();
@@ -117,7 +120,7 @@ const PaymentPage: React.FC<PaymentPage> = () => {
 	
 	return (
 		<MainTemplate>
-			<HeaderMolecule title='São Benedito' subtitle='Barraquinha de ...'/>
+			<HeaderMolecule title='São Benedito' subtitle={authStand}/>
 
 			{ticket && (
 				<TicketMolecule ticket={ticket}/>

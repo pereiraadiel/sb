@@ -23,7 +23,7 @@ const HomePage: React.FC<HomePage> = ({}) => {
 		setShouldShowCamera(status === 'granted');
 	}
 
-	const handleTicketRead = () => {
+	const handleEnableCamera = () => {
 		setHasPermission(false);
 		setShouldShowCamera(false);
 		console.log('requesting camera permission', {
@@ -71,7 +71,7 @@ const HomePage: React.FC<HomePage> = ({}) => {
 						<View className="bg-gray-primary p-4 mb-2 items-center">
 							<TextAtom size="medium" className="text-white-primary mb-6">Acesso à câmera é necessário</TextAtom>
 							<View className="w-24 h-24 bg-gray-tertiary rounded-full items-center justify-center">
-								<Feather name="camera" size={48} color={colors.accent.primary} />
+								<Feather name="camera" size={48} color={colors.accent.tertiary} />
 							</View>
 							<TextAtom size="small" className="text-white-primary mt-6">Por favor permita o acesso à sua câmera</TextAtom>
 							<TextAtom size="small" className="text-white-primary mt-1 text-center w-64">clique no botão "Abrir câmera" para habilitar a câmera e ler o ingresso.</TextAtom>
@@ -87,7 +87,7 @@ const HomePage: React.FC<HomePage> = ({}) => {
 
 			</View>
 			<SeparatorAtom/>
-			<ButtonAtom className="mt-4" onPress={handleTicketRead} >Abrir câmera</ButtonAtom>
+			<ButtonAtom className="mt-4" onPress={handleEnableCamera} >Abrir câmera</ButtonAtom>
 		</MainTemplate>
 	)
 }
