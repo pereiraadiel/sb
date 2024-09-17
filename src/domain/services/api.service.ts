@@ -1,7 +1,19 @@
 import { TicketEntity } from "@/domain/entities/ticket.entity";
 import { GOODS } from "@/domain/utils/goods";
+import { EMOJIS } from "@/domain/utils/emoji.util";
 
 export class ApiService {
+  /**
+   *
+   * @param code
+   * @returns the authentication response
+   */
+
+  useAuthentication(authToken: string) {
+    // inject the authToken in the service
+    return this;
+  }
+
   async authenticate(code: string) {
     // do some api call
     // FAKE IMPLEMENTATION
@@ -53,6 +65,11 @@ export class ApiService {
     };
   }
 
+  /**
+   *
+   * @param qrCode
+   * @returns the ticket associated with the qrCode
+   */
   async getTicketByQrCode(qrCode: string) {
     // do some api call
     return new TicketEntity({
@@ -61,5 +78,32 @@ export class ApiService {
       physicalCode: qrCode,
       balance: 10000,
     });
+  }
+
+  /**
+   *
+   * @param qrCode
+   * @returns array of emoji codes for the ticket authentication transactions
+   */
+  async getTicketAuthEmojis(qrCode: string): Promise<Set<keyof typeof EMOJIS>> {
+    // do some api call
+    // for now, return an random array of emojis
+    const randomIndex = Math.floor(Math.random() * Object.keys(EMOJIS).length);
+    return new Set(
+      Object.keys(EMOJIS).slice(randomIndex, randomIndex + 6) as Array<
+        keyof typeof EMOJIS
+      >
+    );
+  }
+
+  /**
+   *
+   * @param qrCode
+   * @param emoji
+   * @returns true if the ticket is authenticated
+   */
+  async authenticateTicket(qrCode: string, emoji: string) {
+    // do some api call
+    return true;
   }
 }

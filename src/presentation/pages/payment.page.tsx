@@ -23,14 +23,13 @@ const PaymentPage: React.FC<PaymentPage> = () => {
 	const [goods, setGoods] = useState<GoodEntity[]>([]);
 	const [goodQuantity, setGoodQuantity] = useState<{ [key: string]: number }>({});
 	const [selectedGoods, setSelectedGoods] = useState<string[]>([]);
-	const [ticketEmojis, setTicketEmojis] = useState(new Set<(keyof typeof EMOJIS)>());
   const [total, setTotal] = useState<GoodEntity>(new GoodEntity({ id: "total", category: "Total", fullname: "Total", description: "Total", priceCents: 0 }))
   const [finalTicketAmount, setFinalTicketAmount] = useState<number>(0);
 	const [selectedEmoji, setSelectedEmoji] = useState<keyof typeof EMOJIS>();
 	const { navigate } = useNavigation<any>();
 	const route = useRoute<any>();
 	const { qrCode } = route.params;
-	const { ticket, getTicketByQr } = useTicket();
+	const { ticket, getTicketByQr, ticketEmojis, getTicketEmojisForAuthentication, authenticateTicket } = useTicket();
 	const { authToken, stand } = useAuthentication();
 
 	if(!authToken) {
@@ -74,9 +73,13 @@ const PaymentPage: React.FC<PaymentPage> = () => {
 
 	}
 
-	const handleNavigate = () => {
-		console.log('navigating to payment done page');
-		navigate('PaymentDone', { balance: finalTicketAmount });
+	const handleMakeTransaction = async () => {
+		if(!selectedEmoji) return;
+		const isTicketAuthenticated = await authenticateTicket(qrCode, selectedEmoji, authToken);
+		if(isTicketAuthenticated) {
+			console.log('navigating to payment done page');
+			navigate('PaymentDone', { balance: finalTicketAmount });
+		}
 	}
 
 	const fetchGoods  = () => {
@@ -84,11 +87,7 @@ const PaymentPage: React.FC<PaymentPage> = () => {
 	}
 
 	const fetchTicketEmojis = () => {
-		for(let i = 0; i < 8; i++) {
-			const randomIndex = Math.floor(Math.random() * Object.keys(EMOJIS).length);
-			const randomEmoji = Object.keys(EMOJIS)[randomIndex] as keyof typeof EMOJIS;
-			setTicketEmojis((prev) => new Set(prev.add(randomEmoji)));
-		}
+		getTicketEmojisForAuthentication(qrCode, authToken);
 	}
 
 	const calculateTotal = () => {
@@ -151,8 +150,10 @@ const PaymentPage: React.FC<PaymentPage> = () => {
 						<TextAtom size="small">Saldo após a compra</TextAtom>
 						<TextAtom size="small">{toBrlCurrency(finalTicketAmount)}</TextAtom>
 					</View>
-					<EmojiSelectionMolecule emojis={ticketEmojis} selectedEmoji={selectedEmoji} onSelect={setSelectedEmoji}/>
-					<ButtonAtom onPress={handleNavigate} className="mt-4" disabled={selectedEmoji === undefined}>Finalizar transação</ButtonAtom>
+					{ticketEmojis && (
+						<EmojiSelectionMolecule emojis={ticketEmojis} selectedEmoji={selectedEmoji} onSelect={setSelectedEmoji}/>
+					)}
+					<ButtonAtom onPress={handleMakeTransaction} className="mt-4" disabled={selectedEmoji === undefined}>Finalizar transação</ButtonAtom>
 				</>
 			)}
 		</MainTemplate>

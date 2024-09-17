@@ -37,6 +37,19 @@ const CreditPage: React.FC<CreditPage> = ({}) => {
 		navigate('PaymentDone', { balance: finalTicketAmount });
 	}
 
+	const handleCreditTextChange = (value: string) => {
+		setCredit(
+			Number(
+				value.replace('R$', '')
+					.replace(',', '')
+					.replace('.', '')
+					.replace('-', '')
+					.replace(' ', '')
+					.replace(',', '')
+			)
+		);
+	}
+
 	const fetchTicket = (qrCode: string) => {
 		console.log('fetching ticket', qrCode);
 		setTicket({
@@ -70,7 +83,7 @@ const CreditPage: React.FC<CreditPage> = ({}) => {
 					placeholder="Informe o valor desejado" 
 					keyboardType="number-pad"
 					value={toBrlCurrency(credit)}
-					onChangeText={(value) => setCredit(Number(value.replace('R$', '').replace(',', '')))}
+					onChangeText={handleCreditTextChange}
 				/>
 				<View className="flex-row justify-between">
 					<TextAtom size="medium" className="text-white-tertiary mt-2">Saldo Final: </TextAtom>
