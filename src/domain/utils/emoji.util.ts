@@ -24,7 +24,6 @@ const EMOJIS = {
   dog: "🐶",
   cat: "🐱",
   unicorn: "🦄",
-  rainbow: "🌈",
   sun: "☀️",
   moon: "🌙",
   cloud: "☁️",
